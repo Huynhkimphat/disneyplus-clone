@@ -1,102 +1,103 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import styled from 'styled-components'
-import {useDispatch, useSelector} from "react-redux";
-import {useNavigate} from "react-router-dom";
+import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import {auth, provider} from "../firebase";
-import {selectPhoto, selectUserName, setSignOutState, setUserLoginDetails,} from "../features/user/userSlice";
-import {useEffect} from "react";
+import { useEffect } from 'react';
+import { auth, provider } from '../firebase';
+import {
+  selectPhoto, selectUserName, setSignOutState, setUserLoginDetails,
+} from '../features/user/userSlice';
 
-const Header = (props) => {
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
-	const username = useSelector(selectUserName);
-	// const email =useSelector(selectEmail);
-	const photo = useSelector(selectPhoto);
-	
-	useEffect(() => {
-		auth.onAuthStateChanged(async (user) => {
-			if (user) {
-				setUser(user)
-				navigate('/home')
-			} else {
-				navigate('/')
-			}
-		})
-	}, [username])
-	
-	const handleAuth = () => {
-		if (!username) {
-			auth.signInWithPopup(provider)
-			.then((res) => {
-				setUser(res.user)
-			})
-			.catch(e => alert(e.message))
-		} else {
-			auth.signOut()
-			.then(() => {
-				dispatch(setSignOutState())
-			})
-			.catch((e) => alert(e.message))
-		}
-	}
-	
-	const setUser = (user) => {
-		dispatch(setUserLoginDetails({
-			name: user.displayName,
-			email: user.email,
-			photo: user.photoURL,
-		}))
-	}
-	
-	return (
-		<Nav>
-			<Logo>
-				<img src="/images/logo.svg" alt="Disney+"/>
-			</Logo>
-			
-			{
-				!username ?
-					<Login onClick={handleAuth}>Login</Login>
-					:
-					<>
-						<NavMenu>
-							<a href="/home">
-								<img src="/images/home-icon.svg" alt="HOME"/>
-								<span>HOME</span>
-							</a>
-							<a href="/search">
-								<img src="/images/search-icon.svg" alt="search"/>
-								<span>SEARCH</span>
-							</a>
-							<a href="/watchlist">
-								<img src="/images/watchlist-icon.svg" alt="WATCHLIST"/>
-								<span>WATCHLIST</span>
-							</a>
-							<a href="/original">
-								<img src="/images/original-icon.svg" alt="ORIGINAL"/>
-								<span>ORIGINAL</span>
-							</a>
-							<a href="/movies">
-								<img src="/images/movie-icon.svg" alt="MOVIE"/>
-								<span>ORIGINAL</span>
-							</a>
-							<a href="/series">
-								<img src="/images/series-icon.svg" alt="SERIES"/>
-								<span>SERIES</span>
-							</a>
-						</NavMenu>
-						<SignOut>
-							<UserImg src={photo} alt={username}/>
-							<Dropdown>
-								<span onClick={handleAuth}>Sign Out</span>
-							</Dropdown>
-						</SignOut>
-					</>
-				
-			}
-		</Nav>
-	)
+function Header() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const username = useSelector(selectUserName);
+  // const email =useSelector(selectEmail);
+  const photo = useSelector(selectPhoto);
+
+  const setUser = (user) => {
+    dispatch(setUserLoginDetails({
+      name: user.displayName,
+      email: user.email,
+      photo: user.photoURL,
+    }));
+  };
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        navigate('/home');
+      } else {
+        navigate('/');
+      }
+    });
+  }, [username]);
+
+  const handleAuth = () => {
+    if (!username) {
+      auth.signInWithPopup(provider)
+        .then((res) => {
+          setUser(res.user);
+        })
+      // eslint-disable-next-line no-alert
+        .catch((e) => alert(e.message));
+    } else {
+      auth.signOut()
+        .then(() => {
+          dispatch(setSignOutState());
+        })
+      // eslint-disable-next-line no-alert
+        .catch((e) => alert(e.message));
+    }
+  };
+
+  return (
+    <Nav>
+      <Logo>
+        <img src="/images/logo.svg" alt="Disney+" />
+      </Logo>
+
+      {!username ? <Login onClick={handleAuth}>Login</Login> : (
+        <>
+          <NavMenu>
+            <a href="/home">
+              <img src="/images/home-icon.svg" alt="HOME" />
+              <span>HOME</span>
+            </a>
+            <a href="/search">
+              <img src="/images/search-icon.svg" alt="search" />
+              <span>SEARCH</span>
+            </a>
+            <a href="/watchlist">
+              <img src="/images/watchlist-icon.svg" alt="WATCHLIST" />
+              <span>WATCHLIST</span>
+            </a>
+            <a href="/original">
+              <img src="/images/original-icon.svg" alt="ORIGINAL" />
+              <span>ORIGINAL</span>
+            </a>
+            <a href="/movies">
+              <img src="/images/movie-icon.svg" alt="MOVIE" />
+              <span>ORIGINAL</span>
+            </a>
+            <a href="/series">
+              <img src="/images/series-icon.svg" alt="SERIES" />
+              <span>SERIES</span>
+            </a>
+          </NavMenu>
+          <SignOut>
+            <UserImg src={photo} alt={username} />
+            <Dropdown>
+              {/* eslint-disable-next-line max-len */}
+              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+              <span onClick={handleAuth}>Sign Out</span>
+            </Dropdown>
+          </SignOut>
+        </>
+      )}
+    </Nav>
+  );
 }
 
 const Nav = styled.nav`
@@ -112,7 +113,7 @@ const Nav = styled.nav`
   padding: 0 36px;
   letter-spacing: 16px;
   z-index: 3;
-`
+`;
 
 const Logo = styled.a`
   padding: 0;
@@ -126,7 +127,7 @@ const Logo = styled.a`
     display: block;
     width: 100%;
   }
-`
+`;
 
 const NavMenu = styled.div`
   align-items: center;
@@ -190,7 +191,7 @@ const NavMenu = styled.div`
   @media (max-width: 768px) {
     display: none;
   }
-`
+`;
 
 const Login = styled.a`
   background-color: rgba(0, 0, 0, 0.6);
@@ -207,11 +208,11 @@ const Login = styled.a`
     border-color: transparent;
     cursor: pointer;
   }
-`
+`;
 
 const UserImg = styled.img`
   height: 100%;
-`
+`;
 
 const Dropdown = styled.div`
   position: absolute;
@@ -251,6 +252,5 @@ const SignOut = styled.div`
     }
   }
 `;
-
 
 export default Header;
